@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Renovation Estimator</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    margin: 0;
+    box-sizing: border-box;
+    background: #1e1e1e;
+    color: white;
+}
+.disclaimer {
+    background-color: #fffae6;
+    color: #333;
+    padding: 10px;
+    font-size: 0.9em;
+    border: 1px solid #f0e6b6;
+    margin-bottom: 15px;
+}
+input, select, button {
+    font-size: 16px;
+}
+#chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+.chip {
+    background-color: #e0e0e0;
+    border-radius: 16px;
+    padding: 5px 10px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: black;
+}
+.chip span {
+    margin-left: 8px;
+    cursor: pointer;
+    color: #555;
+}
+.chip span:hover {
+    color: #000;
+}
+.chip-edit, .chip-remove {
+    margin-left: 5px;
+    font-weight: bold;
+}
+form {
+    margin-bottom: 20px;
+}
+label {
+    display: block;
+    margin: 8px 0 4px;
+}
+input, select {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+#calculate-btn {
+    padding: 10px 15px;
+    font-size: 1em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+#calculate-btn:hover {
+    background-color: #45a049;
+}
+#summary {
+    font-size: 1.1em;
+    margin-top: 20px;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div class="disclaimer">
+    <strong>Disclaimer:</strong> This calculator provides estimates only and includes labour cost. Actual quotes may vary.
+</div>
+
+<div id="chips-container"></div>
+
+<form id="city-form">
+    <label for="city-input">City</label>
+    <input type="text" id="city-input" placeholder="Enter city">
+    <button type="button" id="city-add">Add City</button>
+</form>
+<form id="category-form">
+    <label for="category-select">Category</label>
+    <select id="category-select">
+        <option value="" disabled selected>Select a category</option>
+        <option value="Kitchen">Kitchen</option>
+        <option value="Flooring">Flooring</option>
+        <option value="Painting">Painting</option>
+        <option value="Drywall">Drywall</option>
+        <option value="Bathroom">Bathroom</option>
+        <option value="Siding">Siding</option>
+        <option value="Decking">Decking</option>
+        <option value="Fencing">Fencing</option>
+        <option value="Basement">Basement Remodeling</option>
+    </select>
+</form>
+
+<div id="summary">
+    <div>Total Estimate: $<span id="total-cost">0.00</span></div>
+</div>
+
+<script>
+document.getElementById('city-add').addEventListener('click', () => {
+    const city = document.getElementById('city-input').value.trim();
+    if (city) {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.textContent = 'City: ' + city;
+        document.getElementById('chips-container').appendChild(chip);
+        document.getElementById('city-input').value = '';
+    }
+});
+document.getElementById('category-select').addEventListener('change', () => {
+    const category = document.getElementById('category-select').value;
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = 'Category: ' + category;
+    document.getElementById('chips-container').appendChild(chip);
+});
+</script>
+</body>
+</html>
