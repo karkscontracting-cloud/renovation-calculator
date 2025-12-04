@@ -1,216 +1,674 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Renovation Calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karks Contracting – Renovation Calculator</title>
 
   <style>
-    /* Container styling */
-    #reno-calculator {
-      background: #fff;
-      font-family: Arial, sans-serif;
-      max-width: 500px;
-      width: 100%;
-      margin: auto;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      overflow-x: hidden;
-      overflow-y: visible;
-      transition: height 0.4s ease;
-      position: relative;
+    :root {
+      --primary: #1f7aec;
+      --primary-dark: #1553a3;
+      --bg: #f5f7fb;
+      --text-main: #1f2933;
+      --text-muted: #6b7785;
+      --border: #dde2eb;
+      --radius: 10px;
+      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.12);
     }
 
-    #reno-calculator .step {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      transition: transform 0.4s ease;
-    }
-
-    #step1 { transform: translateX(0); z-index: 1; }
-    #step2 { transform: translateX(100%); z-index: 0; }
-
-    #reno-calculator h3 {
-      font-size: 1.1em;
-      margin: 0 0 15px;
-      color: #333;
-    }
-
-    #reno-calculator label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 0.95em;
-      color: #444;
-      cursor: pointer;
-    }
-
-    #reno-calculator label input[type="checkbox"] {
-      margin-right: 8px;
-      position: relative;
-      top: 2px;
-    }
-
-    #reno-calculator input[type="text"],
-    #reno-calculator input[type="email"],
-    #reno-calculator input[type="tel"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
+    * {
       box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 0.95em;
     }
 
-    #reno-calculator button {
-      padding: 10px 20px;
-      font-size: 0.95em;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      background: #007BFF;
-      color: #fff;
+    body {
+      margin: 0;
+      padding: 24px 12px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background: transparent;
+      color: var(--text-main);
     }
 
-    #reno-calculator button:hover { opacity: 0.9; }
+    /* MAIN CARD */
+    #reno-calculator {
+      max-width: 520px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: var(--shadow-soft);
+      padding: 24px 22px 22px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
 
-    #reno-calculator .button-row {
+    .rc-header {
+      margin-bottom: 18px;
+    }
+
+    .rc-eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .rc-title {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+
+    .rc-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .rc-pill-row {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f3f5fb;
+      font-size: 11px;
+      color: #4b5563;
+    }
+
+    .rc-pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #10b981;
+    }
+
+    /* PROGRESS */
+    .rc-progress {
       display: flex;
+      align-items: center;
       justify-content: space-between;
+      margin-bottom: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
-    #reno-calculator .prev-btn {
-      background: #6c757d;
+    .rc-progress-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
     }
 
-    #reno-calculator .prev-btn:hover {
-      opacity: 0.9;
+    .rc-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .rc-dot.active {
+      background: var(--primary);
+      transform: scale(1.15);
+    }
+
+    /* STEPS */
+    .rc-steps {
+      position: relative;
+    }
+
+    .rc-step {
+      display: none;
+    }
+
+    .rc-step.active {
+      display: block;
+    }
+
+    .rc-step h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .rc-step-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    /* SERVICES LIST */
+    .rc-service-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 10px;
+      margin-bottom: 16px;
     }
 
     @media (max-width: 480px) {
-      #reno-calculator {
-        padding: 15px;
+      .rc-service-list {
+        grid-template-columns: minmax(0, 1fr);
       }
-      #reno-calculator .button-row {
-        flex-direction: column;
-      }
-      #reno-calculator .button-row button {
-        width: 100%;
-        margin-bottom: 10px;
-      }
+    }
+
+    .rc-service {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      cursor: pointer;
+      background: #f9fafb;
+      transition: border 0.15s ease, background 0.15s ease,
+        box-shadow 0.15s ease, transform 0.05s ease;
+    }
+
+    .rc-service input {
+      position: relative;
+      width: 15px;
+      height: 15px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .rc-service span {
+      flex: 1;
+    }
+
+    .rc-service.selected {
+      border-color: var(--primary);
+      background: #eef4ff;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.28);
+    }
+
+    /* INPUTS */
+    .rc-field {
+      margin-bottom: 12px;
+    }
+
+    .rc-label {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .rc-label span.helper {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .rc-input,
+    .rc-textarea {
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      outline: none;
+      transition: border 0.15s ease, box-shadow 0.15s ease;
+      font-family: inherit;
+    }
+
+    .rc-input:focus,
+    .rc-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(31, 122, 236, 0.25);
+    }
+
+    .rc-textarea {
+      resize: vertical;
+      min-height: 60px;
+      max-height: 140px;
+    }
+
+    .rc-error {
+      font-size: 11px;
+      color: #b91c1c;
+      margin-top: 3px;
+      display: none;
+    }
+
+    .rc-error.visible {
+      display: block;
+    }
+
+    /* SUMMARY TAGS */
+    .rc-summary-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .rc-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid rgba(129, 140, 248, 0.5);
+    }
+
+    /* BUTTONS */
+    .rc-actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .rc-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.05s ease,
+        box-shadow 0.15s ease;
+      font-family: inherit;
+    }
+
+    .rc-btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .rc-btn-secondary {
+      background: #f3f4f6;
+      color: #111827;
+      border: 1px solid #d4d4d8;
+    }
+
+    .rc-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .rc-btn-primary:hover {
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.48);
+    }
+
+    .rc-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .rc-btn[disabled] {
+      opacity: 0.7;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    /* FOOTNOTE */
+    .rc-footnote {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
+  <div id="reno-calculator">
+    <div class="rc-header">
+      <div class="rc-eyebrow">Karks Contracting Inc.</div>
+      <h2 class="rc-title">Home Renovation Calculator</h2>
+      <p class="rc-sub">
+        Choose the services you’re interested in and share your contact details.
+        Our team will follow up with a tailored estimate for your project.
+      </p>
+      <div class="rc-pill-row">
+        <span class="rc-pill-dot"></span>
+        <span>Fast ballpark planning tool — not a final quote.</span>
+      </div>
+    </div>
 
-<div id="reno-calculator">
-  <div id="step1" class="step">
-    <h3>Select the services you need:</h3>
-    <label><input type="checkbox" name="service" value="Kitchen"> Kitchen Renovation</label>
-    <label><input type="checkbox" name="service" value="Bathroom"> Bathroom Renovation</label>
-    <label><input type="checkbox" name="service" value="Basement"> Basement Renovation</label>
-    <label><input type="checkbox" name="service" value="Fencing"> Fencing</label>
-    <label><input type="checkbox" name="service" value="Decking"> Decking</label>
-    <label><input type="checkbox" name="service" value="Flooring"> Flooring</label>
-    <label><input type="checkbox" name="service" value="Painting"> Painting</label>
-    <label><input type="checkbox" name="service" value="Drywall"> Drywall</label>
-    <div style="text-align:right; margin-top: 10px;">
-      <button type="button" id="nextBtn">Next</button>
+    <div class="rc-progress">
+      <span id="rcStepLabel">Step 1 of 2</span>
+      <div class="rc-progress-dots">
+        <span class="rc-dot active" data-step-dot="1"></span>
+        <span class="rc-dot" data-step-dot="2"></span>
+      </div>
+    </div>
+
+    <div class="rc-steps">
+      <!-- STEP 1: Services -->
+      <div class="rc-step active" id="rcStep1">
+        <h3>Which services are you considering?</h3>
+        <p class="rc-step-desc">
+          Select as many as you like. This helps us understand the scope of your
+          renovation.
+        </p>
+
+        <div class="rc-service-list" id="rcServiceList">
+          <label class="rc-service">
+            <input type="checkbox" value="Kitchen Renovation" />
+            <span>Kitchen renovation</span>
+          </label>
+          <label class="rc-service">
+            <input type="checkbox" value="Bathroom Renovation" />
+            <span>Bathroom renovation</span>
+          </label>
+          <label class="rc-service">
+            <input type="checkbox" value="Basement Renovation" />
+            <span>Basement renovation</span>
+          </label>
+          <label class="rc-service">
+            <input type="checkbox" value="Fencing" />
+            <span>Fencing</span>
+          </label>
+          <label class="rc-service">
+            <input type="checkbox" value="Decking" />
+            <span>Decking</span>
+          </label>
+          <label class="rc-service">
+            <input type="checkbox" value="Flooring" />
+            <span>Flooring</span>
+          </label>
+          <label class="rc-service">
+            <input type="checkbox" value="Painting" />
+            <span>Painting</span>
+          </label>
+          <label class="rc-service">
+            <input type="checkbox" value="Drywall" />
+            <span>Drywall</span>
+          </label>
+        </div>
+
+        <div id="rcServicesError" class="rc-error">
+          Please select at least one service to continue.
+        </div>
+
+        <div class="rc-actions">
+          <button type="button" class="rc-btn rc-btn-primary" id="rcNext">
+            Next step
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Contact -->
+      <div class="rc-step" id="rcStep2">
+        <h3>Tell us how to reach you</h3>
+        <p class="rc-step-desc">
+          We’ll use this information to follow up with an estimate and any
+          clarifying questions about your project.
+        </p>
+
+        <div class="rc-summary-tags" id="rcSummaryTags"></div>
+
+        <div class="rc-field">
+          <div class="rc-label">
+            <span>Name</span>
+          </div>
+          <input
+            type="text"
+            id="rcName"
+            class="rc-input"
+            placeholder="Your full name"
+          />
+          <div id="rcNameError" class="rc-error">
+            Please enter your name.
+          </div>
+        </div>
+
+        <div class="rc-field">
+          <div class="rc-label">
+            <span>Email</span>
+            <span class="helper">So we can send your estimate</span>
+          </div>
+          <input
+            type="email"
+            id="rcEmail"
+            class="rc-input"
+            placeholder="you@example.com"
+          />
+          <div id="rcEmailError" class="rc-error">
+            Please enter a valid email address.
+          </div>
+        </div>
+
+        <div class="rc-field">
+          <div class="rc-label">
+            <span>Phone number</span>
+            <span class="helper">Optional but helpful for questions</span>
+          </div>
+          <input
+            type="tel"
+            id="rcPhone"
+            class="rc-input"
+            placeholder="(000) 000-0000"
+          />
+          <div id="rcPhoneError" class="rc-error">
+            Please enter your phone number.
+          </div>
+        </div>
+
+        <div class="rc-field">
+          <div class="rc-label">
+            <span>Project notes</span>
+            <span class="helper">Room sizes, timeline, budget, etc.</span>
+          </div>
+          <textarea
+            id="rcNotes"
+            class="rc-textarea"
+            placeholder="Tell us a bit about your renovation plans…"
+          ></textarea>
+        </div>
+
+        <div class="rc-actions">
+          <button
+            type="button"
+            class="rc-btn rc-btn-secondary"
+            id="rcBack"
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            class="rc-btn rc-btn-primary"
+            id="rcSubmit"
+          >
+            Submit
+          </button>
+        </div>
+
+        <div class="rc-footnote">
+          Submitting this form does not lock you into any contract. It simply
+          lets Karks Contracting prepare a more accurate ballpark estimate for
+          your project.
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="step2" class="step">
-    <h3>Enter your contact information:</h3>
-    <input type="text" id="name" placeholder="Name">
-    <input type="email" id="email" placeholder="Email">
-    <input type="tel" id="phone" placeholder="Phone Number">
-    <div class="button-row">
-      <button type="button" class="prev-btn" id="prevBtn">Previous</button>
-      <button type="button" id="submitBtn">Submit</button>
-    </div>
-  </div>
-</div>
+  <script>
+    // ----- STEP / STATE LOGIC -----
+    const step1El = document.getElementById("rcStep1");
+    const step2El = document.getElementById("rcStep2");
+    const stepLabelEl = document.getElementById("rcStepLabel");
+    const dots = document.querySelectorAll("[data-step-dot]");
+    const nextBtn = document.getElementById("rcNext");
+    const backBtn = document.getElementById("rcBack");
+    const submitBtn = document.getElementById("rcSubmit");
 
-<script>
-  // --- basic step logic with simple validation ---
-  const step1 = document.getElementById("step1");
-  const step2 = document.getElementById("step2");
-  const nextBtn = document.getElementById("nextBtn");
-  const prevBtn = document.getElementById("prevBtn");
-  const submitBtn = document.getElementById("submitBtn");
+    const serviceListEl = document.getElementById("rcServiceList");
+    const servicesErrorEl = document.getElementById("rcServicesError");
+    const nameInput = document.getElementById("rcName");
+    const emailInput = document.getElementById("rcEmail");
+    const phoneInput = document.getElementById("rcPhone");
+    const notesInput = document.getElementById("rcNotes");
+    const nameError = document.getElementById("rcNameError");
+    const emailError = document.getElementById("rcEmailError");
+    const phoneError = document.getElementById("rcPhoneError");
+    const summaryTags = document.getElementById("rcSummaryTags");
 
-  function showStep(stepIndex) {
-    if (stepIndex === 1) {
-      step1.style.transform = "translateX(0)";
-      step1.style.zIndex = 1;
-      step2.style.transform = "translateX(100%)";
-      step2.style.zIndex = 0;
-    } else {
-      step1.style.transform = "translateX(-100%)";
-      step1.style.zIndex = 0;
-      step2.style.transform = "translateX(0)";
-      step2.style.zIndex = 1;
-    }
-    // after layout changes, send updated height
-    setTimeout(sendHeight, 50);
-  }
+    let currentStep = 1;
 
-  nextBtn.addEventListener("click", function () {
-    const services = document.querySelectorAll('input[name="service"]:checked');
-    if (!services.length) {
-      alert("Please select at least one service.");
-      return;
-    }
-    showStep(2);
-  });
+    function setStep(step) {
+      currentStep = step;
 
-  prevBtn.addEventListener("click", function () {
-    showStep(1);
-  });
+      if (step === 1) {
+        step1El.classList.add("active");
+        step2El.classList.remove("active");
+        stepLabelEl.textContent = "Step 1 of 2";
+      } else {
+        step1El.classList.remove("active");
+        step2El.classList.add("active");
+        stepLabelEl.textContent = "Step 2 of 2";
+      }
 
-  submitBtn.addEventListener("click", function () {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
+      dots.forEach((d) =>
+        d.classList.toggle("active", Number(d.dataset.stepDot) === step)
+      );
 
-    if (!name || !email || !phone) {
-      alert("Please fill in your name, email, and phone.");
-      return;
+      setTimeout(sendHeight, 60);
     }
 
-    // you can hook this up to email / backend later
-    alert("Thank you! Your information has been submitted.");
-  });
+    // highlight selected services
+    serviceListEl.addEventListener("change", (e) => {
+      const label = e.target.closest(".rc-service");
+      if (!label) return;
+      label.classList.toggle("selected", e.target.checked);
+    });
 
-  // --- auto-height messaging for Wix ---
-  function sendHeight() {
-    const main = document.getElementById("reno-calculator") || document.body;
-
-    let h = 0;
-    if (main && main.getBoundingClientRect) {
-      const rect = main.getBoundingClientRect();
-      h = rect.height + 60; // padding
+    function getSelectedServices() {
+      const inputs = serviceListEl.querySelectorAll("input[type='checkbox']");
+      const selected = [];
+      inputs.forEach((i) => {
+        if (i.checked) selected.push(i.value);
+      });
+      return selected;
     }
 
-    if (!h || h < 400) {
-      h =
-        document.documentElement.scrollHeight ||
-        document.body.scrollHeight ||
-        800;
+    function validateStep1() {
+      const selected = getSelectedServices();
+      const valid = selected.length > 0;
+      servicesErrorEl.classList.toggle("visible", !valid);
+      return valid;
     }
 
-    h = Math.ceil(h);
-    const msg = JSON.stringify({ type: "calcHeight", height: h });
-    window.parent.postMessage(msg, "*");
-  }
+    function validateStep2() {
+      let valid = true;
 
-  window.addEventListener("load", sendHeight);
-  window.addEventListener("resize", sendHeight);
-  setInterval(sendHeight, 500);
-</script>
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameError.classList.add("visible");
+        valid = false;
+      } else {
+        nameError.classList.remove("visible");
+      }
 
+      const email = emailInput.value.trim();
+      const emailOK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!emailOK) {
+        emailError.classList.add("visible");
+        valid = false;
+      } else {
+        emailError.classList.remove("visible");
+      }
+
+      const phone = phoneInput.value.trim();
+      if (!phone) {
+        phoneError.classList.add("visible");
+        valid = false;
+      } else {
+        phoneError.classList.remove("visible");
+      }
+
+      return valid;
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (!validateStep1()) return;
+
+      // build summary tags
+      const selected = getSelectedServices();
+      summaryTags.innerHTML = "";
+      selected.forEach((svc) => {
+        const tag = document.createElement("span");
+        tag.className = "rc-tag";
+        tag.textContent = svc;
+        summaryTags.appendChild(tag);
+      });
+
+      setStep(2);
+    });
+
+    backBtn.addEventListener("click", () => {
+      setStep(1);
+    });
+
+    submitBtn.addEventListener("click", () => {
+      if (!validateStep2()) return;
+
+      const payload = {
+        type: "renoFormSubmit",
+        services: getSelectedServices(),
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        phone: phoneInput.value.trim(),
+        notes: notesInput.value.trim(),
+      };
+
+      // send payload up to Wix (or just log for now)
+      try {
+        window.parent.postMessage(JSON.stringify(payload), "*");
+      } catch (e) {
+        console.log("Form payload:", payload);
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitted";
+
+      alert(
+        "Thanks! Your details have been sent to Karks Contracting. We’ll follow up with a renovation estimate."
+      );
+
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+      }, 2000);
+    });
+
+    // ----- HEIGHT MESSAGING FOR WIX -----
+    function sendHeight() {
+      const main = document.getElementById("reno-calculator") || document.body;
+
+      let h = 0;
+      if (main && main.getBoundingClientRect) {
+        const rect = main.getBoundingClientRect();
+        h = rect.height + 40; // padding
+      }
+
+      if (!h || h < 400) {
+        h =
+          document.documentElement.scrollHeight ||
+          document.body.scrollHeight ||
+          800;
+      }
+
+      h = Math.ceil(h);
+      const msg = JSON.stringify({ type: "calcHeight", height: h });
+      window.parent.postMessage(msg, "*");
+    }
+
+    window.addEventListener("load", sendHeight);
+    window.addEventListener("resize", sendHeight);
+    setInterval(sendHeight, 700);
+  </script>
 </body>
 </html>
