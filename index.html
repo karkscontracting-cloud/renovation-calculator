@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Renovation Calculator</title>
-</head>
-<body>
-<div id="reno-calculator">
+
   <style>
     /* Container styling */
     #reno-calculator {
@@ -21,20 +19,26 @@
       overflow-x: hidden;
       overflow-y: visible;
       transition: height 0.4s ease;
+      position: relative;
     }
+
     #reno-calculator .step {
       position: absolute;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       transition: transform 0.4s ease;
     }
+
     #step1 { transform: translateX(0); z-index: 1; }
     #step2 { transform: translateX(100%); z-index: 0; }
+
     #reno-calculator h3 {
       font-size: 1.1em;
       margin: 0 0 15px;
       color: #333;
     }
+
     #reno-calculator label {
       display: block;
       margin-bottom: 8px;
@@ -42,11 +46,13 @@
       color: #444;
       cursor: pointer;
     }
+
     #reno-calculator label input[type="checkbox"] {
       margin-right: 8px;
       position: relative;
       top: 2px;
     }
+
     #reno-calculator input[type="text"],
     #reno-calculator input[type="email"],
     #reno-calculator input[type="tel"] {
@@ -58,6 +64,7 @@
       border-radius: 4px;
       font-size: 0.95em;
     }
+
     #reno-calculator button {
       padding: 10px 20px;
       font-size: 0.95em;
@@ -67,17 +74,22 @@
       background: #007BFF;
       color: #fff;
     }
+
     #reno-calculator button:hover { opacity: 0.9; }
+
     #reno-calculator .button-row {
       display: flex;
       justify-content: space-between;
     }
+
     #reno-calculator .prev-btn {
       background: #6c757d;
     }
+
     #reno-calculator .prev-btn:hover {
       opacity: 0.9;
     }
+
     @media (max-width: 480px) {
       #reno-calculator {
         padding: 15px;
@@ -91,7 +103,10 @@
       }
     }
   </style>
+</head>
+<body>
 
+<div id="reno-calculator">
   <div id="step1" class="step">
     <h3>Select the services you need:</h3>
     <label><input type="checkbox" name="service" value="Kitchen"> Kitchen Renovation</label>
@@ -117,71 +132,78 @@
       <button type="button" id="submitBtn">Submit</button>
     </div>
   </div>
+</div>
 
-  <script>
-    var container = document.getElementById('reno-calculator');
-    var step1 = document.getElementById('step1');
-    var step2 = document.getElementById('step2');
-    var nextBtn = document.getElementById('nextBtn');
-    var prevBtn = document.getElementById('prevBtn');
-    var submitBtn = document.getElementById('submitBtn');
-    var nameInput = document.getElementById('name');
-    var emailInput = document.getElementById('email');
-    var phoneInput = document.getElementById('phone');
-    var step1Height = step1.offsetHeight;
-    var step2Height = step2.offsetHeight;
-    container.style.height = step1Height + 'px';
+<script>
+  // --- basic step logic with simple validation ---
+  const step1 = document.getElementById("step1");
+  const step2 = document.getElementById("step2");
+  const nextBtn = document.getElementById("nextBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const submitBtn = document.getElementById("submitBtn");
 
-    function validateEmail(email) {
-      var re = /^\S+@\S+\.\S+$/;
-      return re.test(email);
+  function showStep(stepIndex) {
+    if (stepIndex === 1) {
+      step1.style.transform = "translateX(0)";
+      step1.style.zIndex = 1;
+      step2.style.transform = "translateX(100%)";
+      step2.style.zIndex = 0;
+    } else {
+      step1.style.transform = "translateX(-100%)";
+      step1.style.zIndex = 0;
+      step2.style.transform = "translateX(0)";
+      step2.style.zIndex = 1;
+    }
+    // after layout changes, send updated height
+    setTimeout(sendHeight, 50);
+  }
+
+  nextBtn.addEventListener("click", function () {
+    const services = document.querySelectorAll('input[name="service"]:checked');
+    if (!services.length) {
+      alert("Please select at least one service.");
+      return;
+    }
+    showStep(2);
+  });
+
+  prevBtn.addEventListener("click", function () {
+    showStep(1);
+  });
+
+  submitBtn.addEventListener("click", function () {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    if (!name || !email || !phone) {
+      alert("Please fill in your name, email, and phone.");
+      return;
     }
 
-    nextBtn.onclick = function() {
-      var services = step1.querySelectorAll('input[type="checkbox"]');
-      var oneChecked = false;
-      for (var i = 0; i < services.length; i++) {
-        if (services[i].checked) { oneChecked = true; break; }
-      }
-      if (!oneChecked) {
-        alert("Please select at least one service before continuing.");
-        return;
-      }
-      step1.style.zIndex = 2;
-      step2.style.zIndex = 1;
-      step1.style.transform = "translateX(-100%)";
-      step2.style.transform = "translateX(0%)";
-      container.style.height = step2Height + "px";
-    };
+    // you can hook this up to email / backend later
+    alert("Thank you! Your information has been submitted.");
+  });
 
-    prevBtn.onclick = function() {
-      step2.style.zIndex = 2;
-      step1.style.zIndex = 1;
-      step1.style.transform = "translateX(0%)";
-      step2.style.transform = "translateX(100%)";
-      container.style.height = step1Height + "px";
-    };
-
-    submitBtn.onclick = function() {
-      var nameVal = nameInput.value.trim();
-      var emailVal = emailInput.value.trim();
-      var phoneVal = phoneInput.value.trim();
-      if (nameVal === "" || emailVal === "" || phoneVal === "") {
-        alert("Please fill out all contact fields (Name, Email, Phone).");
-        return;
-      }
-      if (!validateEmail(emailVal)) {
-        alert("Please enter a valid email address.");
-        return;
-      }
-      alert("Thank you! Your renovation inquiry has been recorded.");
-    };
-  </script>
-</div>
-  <script>
+  // --- auto-height messaging for Wix ---
   function sendHeight() {
-    var h = document.documentElement.scrollHeight || document.body.scrollHeight;
-    var msg = JSON.stringify({ type: "calcHeight", height: h });
+    const main = document.getElementById("reno-calculator") || document.body;
+
+    let h = 0;
+    if (main && main.getBoundingClientRect) {
+      const rect = main.getBoundingClientRect();
+      h = rect.height + 60; // padding
+    }
+
+    if (!h || h < 400) {
+      h =
+        document.documentElement.scrollHeight ||
+        document.body.scrollHeight ||
+        800;
+    }
+
+    h = Math.ceil(h);
+    const msg = JSON.stringify({ type: "calcHeight", height: h });
     window.parent.postMessage(msg, "*");
   }
 
@@ -189,9 +211,6 @@
   window.addEventListener("resize", sendHeight);
   setInterval(sendHeight, 500);
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
