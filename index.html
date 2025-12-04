@@ -1,144 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Renovation Estimator</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    padding: 10px;
-    margin: 0;
-    box-sizing: border-box;
-    background: #1e1e1e;
-    color: white;
-}
-.disclaimer {
-    background-color: #fffae6;
-    color: #333;
-    padding: 10px;
-    font-size: 0.9em;
-    border: 1px solid #f0e6b6;
-    margin-bottom: 15px;
-}
-input, select, button {
-    font-size: 16px;
-}
-#chips-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-bottom: 15px;
-}
-.chip {
-    background-color: #e0e0e0;
-    border-radius: 16px;
-    padding: 5px 10px;
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.9em;
-    color: black;
-}
-.chip span {
-    margin-left: 8px;
-    cursor: pointer;
-    color: #555;
-}
-.chip span:hover {
-    color: #000;
-}
-.chip-edit, .chip-remove {
-    margin-left: 5px;
-    font-weight: bold;
-}
-form {
-    margin-bottom: 20px;
-}
-label {
-    display: block;
-    margin: 8px 0 4px;
-}
-input, select {
-    width: 100%;
-    padding: 6px;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-}
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-}
-#calculate-btn {
-    padding: 10px 15px;
-    font-size: 1em;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-#calculate-btn:hover {
-    background-color: #45a049;
-}
-#summary {
-    font-size: 1.1em;
-    margin-top: 20px;
-    font-weight: bold;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Renovation Calculator</title>
 </head>
 <body>
-<div class="disclaimer">
-    <strong>Disclaimer:</strong> This calculator provides estimates only and includes labour cost. Actual quotes may vary.
-</div>
-
-<div id="chips-container"></div>
-
-<form id="city-form">
-    <label for="city-input">City</label>
-    <input type="text" id="city-input" placeholder="Enter city">
-    <button type="button" id="city-add">Add City</button>
-</form>
-<form id="category-form">
-    <label for="category-select">Category</label>
-    <select id="category-select">
-        <option value="" disabled selected>Select a category</option>
-        <option value="Kitchen">Kitchen</option>
-        <option value="Flooring">Flooring</option>
-        <option value="Painting">Painting</option>
-        <option value="Drywall">Drywall</option>
-        <option value="Bathroom">Bathroom</option>
-        <option value="Siding">Siding</option>
-        <option value="Decking">Decking</option>
-        <option value="Fencing">Fencing</option>
-        <option value="Basement">Basement Remodeling</option>
-    </select>
-</form>
-
-<div id="summary">
-    <div>Total Estimate: $<span id="total-cost">0.00</span></div>
-</div>
-
-<script>
-document.getElementById('city-add').addEventListener('click', () => {
-    const city = document.getElementById('city-input').value.trim();
-    if (city) {
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        chip.textContent = 'City: ' + city;
-        document.getElementById('chips-container').appendChild(chip);
-        document.getElementById('city-input').value = '';
+<div id="reno-calculator">
+  <style>
+    /* Container styling */
+    #reno-calculator {
+      background: #fff;
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      width: 100%;
+      margin: auto;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      overflow-x: hidden;
+      overflow-y: visible;
+      transition: height 0.4s ease;
     }
-});
-document.getElementById('category-select').addEventListener('change', () => {
-    const category = document.getElementById('category-select').value;
-    const chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.textContent = 'Category: ' + category;
-    document.getElementById('chips-container').appendChild(chip);
-});
-</script>
+    #reno-calculator .step {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      transition: transform 0.4s ease;
+    }
+    #step1 { transform: translateX(0); z-index: 1; }
+    #step2 { transform: translateX(100%); z-index: 0; }
+    #reno-calculator h3 {
+      font-size: 1.1em;
+      margin: 0 0 15px;
+      color: #333;
+    }
+    #reno-calculator label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+      color: #444;
+      cursor: pointer;
+    }
+    #reno-calculator label input[type="checkbox"] {
+      margin-right: 8px;
+      position: relative;
+      top: 2px;
+    }
+    #reno-calculator input[type="text"],
+    #reno-calculator input[type="email"],
+    #reno-calculator input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.95em;
+    }
+    #reno-calculator button {
+      padding: 10px 20px;
+      font-size: 0.95em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #007BFF;
+      color: #fff;
+    }
+    #reno-calculator button:hover { opacity: 0.9; }
+    #reno-calculator .button-row {
+      display: flex;
+      justify-content: space-between;
+    }
+    #reno-calculator .prev-btn {
+      background: #6c757d;
+    }
+    #reno-calculator .prev-btn:hover {
+      opacity: 0.9;
+    }
+    @media (max-width: 480px) {
+      #reno-calculator {
+        padding: 15px;
+      }
+      #reno-calculator .button-row {
+        flex-direction: column;
+      }
+      #reno-calculator .button-row button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+
+  <div id="step1" class="step">
+    <h3>Select the services you need:</h3>
+    <label><input type="checkbox" name="service" value="Kitchen"> Kitchen Renovation</label>
+    <label><input type="checkbox" name="service" value="Bathroom"> Bathroom Renovation</label>
+    <label><input type="checkbox" name="service" value="Basement"> Basement Renovation</label>
+    <label><input type="checkbox" name="service" value="Fencing"> Fencing</label>
+    <label><input type="checkbox" name="service" value="Decking"> Decking</label>
+    <label><input type="checkbox" name="service" value="Flooring"> Flooring</label>
+    <label><input type="checkbox" name="service" value="Painting"> Painting</label>
+    <label><input type="checkbox" name="service" value="Drywall"> Drywall</label>
+    <div style="text-align:right; margin-top: 10px;">
+      <button type="button" id="nextBtn">Next</button>
+    </div>
+  </div>
+
+  <div id="step2" class="step">
+    <h3>Enter your contact information:</h3>
+    <input type="text" id="name" placeholder="Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="tel" id="phone" placeholder="Phone Number">
+    <div class="button-row">
+      <button type="button" class="prev-btn" id="prevBtn">Previous</button>
+      <button type="button" id="submitBtn">Submit</button>
+    </div>
+  </div>
+
+  <script>
+    var container = document.getElementById('reno-calculator');
+    var step1 = document.getElementById('step1');
+    var step2 = document.getElementById('step2');
+    var nextBtn = document.getElementById('nextBtn');
+    var prevBtn = document.getElementById('prevBtn');
+    var submitBtn = document.getElementById('submitBtn');
+    var nameInput = document.getElementById('name');
+    var emailInput = document.getElementById('email');
+    var phoneInput = document.getElementById('phone');
+    var step1Height = step1.offsetHeight;
+    var step2Height = step2.offsetHeight;
+    container.style.height = step1Height + 'px';
+
+    function validateEmail(email) {
+      var re = /^\S+@\S+\.\S+$/;
+      return re.test(email);
+    }
+
+    nextBtn.onclick = function() {
+      var services = step1.querySelectorAll('input[type="checkbox"]');
+      var oneChecked = false;
+      for (var i = 0; i < services.length; i++) {
+        if (services[i].checked) { oneChecked = true; break; }
+      }
+      if (!oneChecked) {
+        alert("Please select at least one service before continuing.");
+        return;
+      }
+      step1.style.zIndex = 2;
+      step2.style.zIndex = 1;
+      step1.style.transform = "translateX(-100%)";
+      step2.style.transform = "translateX(0%)";
+      container.style.height = step2Height + "px";
+    };
+
+    prevBtn.onclick = function() {
+      step2.style.zIndex = 2;
+      step1.style.zIndex = 1;
+      step1.style.transform = "translateX(0%)";
+      step2.style.transform = "translateX(100%)";
+      container.style.height = step1Height + "px";
+    };
+
+    submitBtn.onclick = function() {
+      var nameVal = nameInput.value.trim();
+      var emailVal = emailInput.value.trim();
+      var phoneVal = phoneInput.value.trim();
+      if (nameVal === "" || emailVal === "" || phoneVal === "") {
+        alert("Please fill out all contact fields (Name, Email, Phone).");
+        return;
+      }
+      if (!validateEmail(emailVal)) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+      alert("Thank you! Your renovation inquiry has been recorded.");
+    };
+  </script>
+</div>
 </body>
 </html>
