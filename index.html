@@ -179,13 +179,18 @@
   </script>
 </div>
   <script>
-function sendHeight() {
-    const height = document.body.scrollHeight;
-    parent.postMessage({frameHeight: height}, "*");
-}
-window.onload = sendHeight;
-window.onresize = sendHeight;
-setInterval(sendHeight, 500); 
+  function sendHeight() {
+    var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+    // send height to the parent (the HTML component iframe in Wix)
+    window.parent.postMessage({ frameHeight: h }, "*");
+  }
+
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+  setInterval(sendHeight, 500);
 </script>
+</body>
+</html>
+
 </body>
 </html>
