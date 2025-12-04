@@ -645,25 +645,25 @@
     });
 
     // ----- HEIGHT MESSAGING FOR WIX -----
-    function sendHeight() {
-  // Use the full document height (most reliable inside GitHub Pages)
-  var h = Math.max(
-    document.body.scrollHeight,
-    document.documentElement.scrollHeight,
-    document.body.offsetHeight,
-    document.documentElement.offsetHeight
-  ) + 60; // small buffer
+    <script>
+  function sendHeight() {
+    var h = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight
+    ) + 40; // small buffer
 
-  h = Math.ceil(h);
+    h = Math.ceil(h);
 
-  var msg = JSON.stringify({ type: "calcHeight", height: h });
-  window.parent.postMessage(msg, "*");
-}
+    // send to the HTML wrapper inside Wix
+    window.parent.postMessage({ type: "calcHeight", height: h }, "*");
+  }
 
+  window.addEventListener("load", sendHeight);
+  window.addEventListener("resize", sendHeight);
+  setInterval(sendHeight, 500);
+</script>
 
-    window.addEventListener("load", sendHeight);
-    window.addEventListener("resize", sendHeight);
-    setInterval(sendHeight, 700);
-  </script>
 </body>
 </html>
