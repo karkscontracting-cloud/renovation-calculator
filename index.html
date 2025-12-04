@@ -182,7 +182,6 @@
   function sendHeight() {
     var h = document.documentElement.scrollHeight || document.body.scrollHeight;
     var msg = JSON.stringify({ type: "calcHeight", height: h });
-    // send JSON string up to the parent
     window.parent.postMessage(msg, "*");
   }
 
@@ -190,6 +189,7 @@
   window.addEventListener("resize", sendHeight);
   setInterval(sendHeight, 500);
 </script>
+
 </body>
 </html>
 
