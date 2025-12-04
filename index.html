@@ -181,8 +181,9 @@
   <script>
   function sendHeight() {
     var h = document.documentElement.scrollHeight || document.body.scrollHeight;
-    // send height to the parent (the HTML component iframe in Wix)
-    window.parent.postMessage({ frameHeight: h }, "*");
+    var msg = JSON.stringify({ type: "calcHeight", height: h });
+    // send JSON string up to the parent
+    window.parent.postMessage(msg, "*");
   }
 
   window.addEventListener("load", sendHeight);
