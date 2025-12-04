@@ -646,25 +646,20 @@
 
     // ----- HEIGHT MESSAGING FOR WIX -----
     function sendHeight() {
-      const main = document.getElementById("reno-calculator") || document.body;
+  // Use the full document height (most reliable inside GitHub Pages)
+  var h = Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body.offsetHeight,
+    document.documentElement.offsetHeight
+  ) + 60; // small buffer
 
-      let h = 0;
-      if (main && main.getBoundingClientRect) {
-        const rect = main.getBoundingClientRect();
-        h = rect.height + 40; // padding
-      }
+  h = Math.ceil(h);
 
-      if (!h || h < 400) {
-        h =
-          document.documentElement.scrollHeight ||
-          document.body.scrollHeight ||
-          800;
-      }
+  var msg = JSON.stringify({ type: "calcHeight", height: h });
+  window.parent.postMessage(msg, "*");
+}
 
-      h = Math.ceil(h);
-      const msg = JSON.stringify({ type: "calcHeight", height: h });
-      window.parent.postMessage(msg, "*");
-    }
 
     window.addEventListener("load", sendHeight);
     window.addEventListener("resize", sendHeight);
