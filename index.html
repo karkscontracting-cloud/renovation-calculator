@@ -3,666 +3,394 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Karks Contracting – Renovation Calculator</title>
-
+  <title>Renovation Cost Calculator</title>
   <style>
-    :root {
-      --primary: #1f7aec;
-      --primary-dark: #1553a3;
-      --bg: #f5f7fb;
-      --text-main: #1f2933;
-      --text-muted: #6b7785;
-      --border: #dde2eb;
-      --radius: 10px;
-      --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.12);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
+    /* Basic reset and typography */
     body {
       margin: 0;
-      padding: 24px 12px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, sans-serif;
-      background: transparent;
-      color: var(--text-main);
-    }
-
-    /* MAIN CARD */
-    #reno-calculator {
-      max-width: 520px;
-      margin: 0 auto;
+      font-family: Arial, sans-serif;
       background: #ffffff;
-      border-radius: 18px;
-      box-shadow: var(--shadow-soft);
-      padding: 24px 22px 22px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
+      color: #333;
     }
-
-    .rc-header {
-      margin-bottom: 18px;
+    .calculator-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
     }
-
-    .rc-eyebrow {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .rc-title {
-      font-size: 19px;
-      font-weight: 700;
-      margin: 0 0 4px;
-    }
-
-    .rc-sub {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    .rc-pill-row {
-      display: inline-flex;
-      gap: 6px;
-      align-items: center;
-      margin-top: 10px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #f3f5fb;
-      font-size: 11px;
-      color: #4b5563;
-    }
-
-    .rc-pill-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #10b981;
-    }
-
-    /* PROGRESS */
-    .rc-progress {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .rc-progress-dots {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .rc-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
-
-    .rc-dot.active {
-      background: var(--primary);
-      transform: scale(1.15);
-    }
-
-    /* STEPS */
-    .rc-steps {
-      position: relative;
-    }
-
-    .rc-step {
-      display: none;
-    }
-
-    .rc-step.active {
-      display: block;
-    }
-
-    .rc-step h3 {
-      margin: 0 0 10px;
-      font-size: 15px;
-    }
-
-    .rc-step-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
-
-    /* SERVICES LIST */
-    .rc-service-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px 10px;
-      margin-bottom: 16px;
-    }
-
-    @media (max-width: 480px) {
-      .rc-service-list {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    .rc-service {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      font-size: 13px;
-      cursor: pointer;
-      background: #f9fafb;
-      transition: border 0.15s ease, background 0.15s ease,
-        box-shadow 0.15s ease, transform 0.05s ease;
-    }
-
-    .rc-service input {
-      position: relative;
-      width: 15px;
-      height: 15px;
-      accent-color: var(--primary);
-      cursor: pointer;
-    }
-
-    .rc-service span {
-      flex: 1;
-    }
-
-    .rc-service.selected {
-      border-color: var(--primary);
-      background: #eef4ff;
-      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.28);
-    }
-
-    /* INPUTS */
-    .rc-field {
-      margin-bottom: 12px;
-    }
-
-    .rc-label {
-      font-size: 12px;
-      font-weight: 500;
-      margin-bottom: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .rc-label span.helper {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
-    .rc-input,
-    .rc-textarea {
-      width: 100%;
-      padding: 9px 10px;
-      border-radius: 9px;
-      border: 1px solid var(--border);
-      font-size: 13px;
-      outline: none;
-      transition: border 0.15s ease, box-shadow 0.15s ease;
-      font-family: inherit;
-    }
-
-    .rc-input:focus,
-    .rc-textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 1px rgba(31, 122, 236, 0.25);
-    }
-
-    .rc-textarea {
-      resize: vertical;
-      min-height: 60px;
-      max-height: 140px;
-    }
-
-    .rc-error {
-      font-size: 11px;
-      color: #b91c1c;
-      margin-top: 3px;
-      display: none;
-    }
-
-    .rc-error.visible {
-      display: block;
-    }
-
-    /* SUMMARY TAGS */
-    .rc-summary-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+    h2 {
+      text-align: center;
+      color: #002D62; /* navy */
       margin-bottom: 10px;
     }
-
-    .rc-tag {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #eff6ff;
-      color: #1d4ed8;
-      border: 1px solid rgba(129, 140, 248, 0.5);
+    p.step-counter {
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
     }
 
-    /* BUTTONS */
-    .rc-actions {
-      margin-top: 16px;
+    /* Progress bar */
+    .progress-bar {
+      background: #f0f0f0;
+      border-radius: 5px;
+      overflow: hidden;
+      height: 8px;
+      margin-bottom: 20px;
+    }
+    .progress-bar .progress {
+      background: #FF8C00; /* orange */
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Steps container */
+    .steps-wrapper {
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
+      transition: transform 0.4s ease;
+      /* width will auto-adjust to number of steps via flex; each step is 100% width */
     }
-
-    .rc-btn {
-      flex: 1;
-      border-radius: 999px;
-      border: none;
-      padding: 9px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: background 0.15s ease, transform 0.05s ease,
-        box-shadow 0.15s ease;
-      font-family: inherit;
+    .step {
+      flex: 0 0 100%;
+      /* Each step panel occupies full container width */
+      box-sizing: border-box;
+      padding: 15px;
     }
-
-    .rc-btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #ffffff;
-      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+    .step input[type="number"],
+    .step input[type="text"],
+    .step input[type="email"],
+    .step input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-
-    .rc-btn-secondary {
-      background: #f3f4f6;
-      color: #111827;
-      border: 1px solid #d4d4d8;
+    .step label {
+      font-weight: bold;
     }
-
-    .rc-btn:hover {
-      transform: translateY(-1px);
+    .step .note {
+      display: block;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 10px;
     }
-
-    .rc-btn-primary:hover {
-      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.48);
-    }
-
-    .rc-btn:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
-    .rc-btn[disabled] {
-      opacity: 0.7;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    /* FOOTNOTE */
-    .rc-footnote {
+    .total-display {
+      font-weight: bold;
+      font-size: 1.1rem;
       margin-top: 10px;
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.4;
+    }
+
+    /* Navigation buttons */
+    .navigation {
+      margin-top: 10px;
+      text-align: center;
+    }
+    .navigation button {
+      font: inherit;
+      padding: 12px 20px;
+      margin: 5px 10px;
+      border: 2px solid #002D62;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    #prevBtn {
+      background: #ffffff;
+      color: #002D62;
+    }
+    #nextBtn {
+      background: #FF8C00;
+      border-color: #FF8C00;
+      color: #fff;
+    }
+    .navigation button:hover {
+      opacity: 0.8;
+    }
+    .navigation button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Error message styling */
+    .error-msg {
+      color: #d00000;
+      font-size: 0.9rem;
+      display: none;
+      margin: -10px 0 10px 0;
+    }
+    .error-border {
+      border-color: #d00000 !important;
+    }
+
+    /* Hide number input spinners for a cleaner look (Chrome/Edge/Opera) */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    /* Hide spinner arrows for Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
     }
   </style>
 </head>
 <body>
-  <div id="reno-calculator">
-    <div class="rc-header">
-      <div class="rc-eyebrow">Karks Contracting Inc.</div>
-      <h2 class="rc-title">Home Renovation Calculator</h2>
-      <p class="rc-sub">
-        Choose the services you’re interested in and share your contact details.
-        Our team will follow up with a tailored estimate for your project.
+
+<div class="calculator-container">
+  <h2>Renovation Cost Calculator</h2>
+  <!-- Progress indicator -->
+  <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
+  <p class="step-counter" id="stepCounter">Step 1 of 9</p>
+
+  <!-- Steps wrapper for sliding -->
+  <div class="steps-wrapper" id="stepsWrapper">
+    <!-- Step 1: Kitchen -->
+    <div class="step">
+      <label for="kitchens">Kitchen Renovation - How many kitchens?</label>
+      <span class="note">(Estimated $20,000 per kitchen)</span>
+      <input id="kitchens" name="kitchens" type="number" min="0" step="1" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 2: Bathroom -->
+    <div class="step">
+      <label for="bathrooms">Bathroom Renovation - How many bathrooms?</label>
+      <span class="note">(Estimated $7,000 per bathroom)</span>
+      <input id="bathrooms" name="bathrooms" type="number" min="0" step="1" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 3: Basement -->
+    <div class="step">
+      <label for="basement">Basement Renovation - Approx. area (sq ft)?</label>
+      <span class="note">(Estimated $75 per sq ft)</span>
+      <input id="basement" name="basement" type="number" min="0" step="any" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 4: Fencing -->
+    <div class="step">
+      <label for="fencing">Fencing - Approx. length (linear ft)?</label>
+      <span class="note">(Estimated $30 per linear ft)</span>
+      <input id="fencing" name="fencing" type="number" min="0" step="any" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 5: Decking -->
+    <div class="step">
+      <label for="decking">Decking - Approx. area (sq ft)?</label>
+      <span class="note">(Estimated $50 per sq ft)</span>
+      <input id="decking" name="decking" type="number" min="0" step="any" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 6: Flooring -->
+    <div class="step">
+      <label for="flooring">Flooring - Area to install (sq ft)?</label>
+      <span class="note">(Estimated $6 per sq ft)</span>
+      <input id="flooring" name="flooring" type="number" min="0" step="any" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 7: Painting -->
+    <div class="step">
+      <label for="painting">Painting - Area to paint (sq ft)?</label>
+      <span class="note">(Estimated $2.5 per sq ft)</span>
+      <input id="painting" name="painting" type="number" min="0" step="any" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 8: Drywall -->
+    <div class="step">
+      <label for="drywall">Drywall - Area to install (sq ft)?</label>
+      <span class="note">(Estimated $2.5 per sq ft)</span>
+      <input id="drywall" name="drywall" type="number" min="0" step="any" value="0" />
+      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
+    </div>
+    <!-- Step 9: Contact Info (Final) -->
+    <div class="step">
+      <label for="name">Name:</label>
+      <input id="name" name="name" type="text" placeholder="Your Name" />
+      <span class="error-msg" id="nameError">Please enter your name.</span>
+
+      <label for="email">Email:</label>
+      <input id="email" name="email" type="email" placeholder="you@example.com" />
+      <span class="error-msg" id="emailError">Please enter a valid email.</span>
+
+      <label for="phone">Phone:</label>
+      <input id="phone" name="phone" type="tel" placeholder="1234567890" />
+      <span class="error-msg" id="phoneError">Please enter a valid phone number.</span>
+
+      <div class="total-display">Estimated Total: $<span class="total-amount"></span></div>
+      <p style="margin-top: 5px; font-size: 0.9rem; color: #555;">
+        * This is a rough estimate. Actual costs may vary.
       </p>
-      <div class="rc-pill-row">
-        <span class="rc-pill-dot"></span>
-        <span>Fast ballpark planning tool — not a final quote.</span>
-      </div>
-    </div>
-
-    <div class="rc-progress">
-      <span id="rcStepLabel">Step 1 of 2</span>
-      <div class="rc-progress-dots">
-        <span class="rc-dot active" data-step-dot="1"></span>
-        <span class="rc-dot" data-step-dot="2"></span>
-      </div>
-    </div>
-
-    <div class="rc-steps">
-      <!-- STEP 1: Services -->
-      <div class="rc-step active" id="rcStep1">
-        <h3>Which services are you considering?</h3>
-        <p class="rc-step-desc">
-          Select as many as you like. This helps us understand the scope of your
-          renovation.
-        </p>
-
-        <div class="rc-service-list" id="rcServiceList">
-          <label class="rc-service">
-            <input type="checkbox" value="Kitchen Renovation" />
-            <span>Kitchen renovation</span>
-          </label>
-          <label class="rc-service">
-            <input type="checkbox" value="Bathroom Renovation" />
-            <span>Bathroom renovation</span>
-          </label>
-          <label class="rc-service">
-            <input type="checkbox" value="Basement Renovation" />
-            <span>Basement renovation</span>
-          </label>
-          <label class="rc-service">
-            <input type="checkbox" value="Fencing" />
-            <span>Fencing</span>
-          </label>
-          <label class="rc-service">
-            <input type="checkbox" value="Decking" />
-            <span>Decking</span>
-          </label>
-          <label class="rc-service">
-            <input type="checkbox" value="Flooring" />
-            <span>Flooring</span>
-          </label>
-          <label class="rc-service">
-            <input type="checkbox" value="Painting" />
-            <span>Painting</span>
-          </label>
-          <label class="rc-service">
-            <input type="checkbox" value="Drywall" />
-            <span>Drywall</span>
-          </label>
-        </div>
-
-        <div id="rcServicesError" class="rc-error">
-          Please select at least one service to continue.
-        </div>
-
-        <div class="rc-actions">
-          <button type="button" class="rc-btn rc-btn-primary" id="rcNext">
-            Next step
-          </button>
-        </div>
-      </div>
-
-      <!-- STEP 2: Contact -->
-      <div class="rc-step" id="rcStep2">
-        <h3>Tell us how to reach you</h3>
-        <p class="rc-step-desc">
-          We’ll use this information to follow up with an estimate and any
-          clarifying questions about your project.
-        </p>
-
-        <div class="rc-summary-tags" id="rcSummaryTags"></div>
-
-        <div class="rc-field">
-          <div class="rc-label">
-            <span>Name</span>
-          </div>
-          <input
-            type="text"
-            id="rcName"
-            class="rc-input"
-            placeholder="Your full name"
-          />
-          <div id="rcNameError" class="rc-error">
-            Please enter your name.
-          </div>
-        </div>
-
-        <div class="rc-field">
-          <div class="rc-label">
-            <span>Email</span>
-            <span class="helper">So we can send your estimate</span>
-          </div>
-          <input
-            type="email"
-            id="rcEmail"
-            class="rc-input"
-            placeholder="you@example.com"
-          />
-          <div id="rcEmailError" class="rc-error">
-            Please enter a valid email address.
-          </div>
-        </div>
-
-        <div class="rc-field">
-          <div class="rc-label">
-            <span>Phone number</span>
-            <span class="helper">Optional but helpful for questions</span>
-          </div>
-          <input
-            type="tel"
-            id="rcPhone"
-            class="rc-input"
-            placeholder="(000) 000-0000"
-          />
-          <div id="rcPhoneError" class="rc-error">
-            Please enter your phone number.
-          </div>
-        </div>
-
-        <div class="rc-field">
-          <div class="rc-label">
-            <span>Project notes</span>
-            <span class="helper">Room sizes, timeline, budget, etc.</span>
-          </div>
-          <textarea
-            id="rcNotes"
-            class="rc-textarea"
-            placeholder="Tell us a bit about your renovation plans…"
-          ></textarea>
-        </div>
-
-        <div class="rc-actions">
-          <button
-            type="button"
-            class="rc-btn rc-btn-secondary"
-            id="rcBack"
-          >
-            Back
-          </button>
-          <button
-            type="button"
-            class="rc-btn rc-btn-primary"
-            id="rcSubmit"
-          >
-            Submit
-          </button>
-        </div>
-
-        <div class="rc-footnote">
-          Submitting this form does not lock you into any contract. It simply
-          lets Karks Contracting prepare a more accurate ballpark estimate for
-          your project.
-        </div>
-      </div>
     </div>
   </div>
 
-  <script>
-    // ----- STEP / STATE LOGIC -----
-    const step1El = document.getElementById("rcStep1");
-    const step2El = document.getElementById("rcStep2");
-    const stepLabelEl = document.getElementById("rcStepLabel");
-    const dots = document.querySelectorAll("[data-step-dot]");
-    const nextBtn = document.getElementById("rcNext");
-    const backBtn = document.getElementById("rcBack");
-    const submitBtn = document.getElementById("rcSubmit");
+  <!-- Navigation Buttons -->
+  <div class="navigation">
+    <button type="button" id="prevBtn">Previous</button>
+    <button type="button" id="nextBtn">Next</button>
+  </div>
+</div>
 
-    const serviceListEl = document.getElementById("rcServiceList");
-    const servicesErrorEl = document.getElementById("rcServicesError");
-    const nameInput = document.getElementById("rcName");
-    const emailInput = document.getElementById("rcEmail");
-    const phoneInput = document.getElementById("rcPhone");
-    const notesInput = document.getElementById("rcNotes");
-    const nameError = document.getElementById("rcNameError");
-    const emailError = document.getElementById("rcEmailError");
-    const phoneError = document.getElementById("rcPhoneError");
-    const summaryTags = document.getElementById("rcSummaryTags");
+<script>
+(function(){
+  // All input fields for cost calculation:
+  const fields = {
+    kitchens: document.getElementById('kitchens'),
+    bathrooms: document.getElementById('bathrooms'),
+    basement: document.getElementById('basement'),
+    fencing: document.getElementById('fencing'),
+    decking: document.getElementById('decking'),
+    flooring: document.getElementById('flooring'),
+    painting: document.getElementById('painting'),
+    drywall: document.getElementById('drywall')
+  };
+  const totalDisplays = document.querySelectorAll('.total-amount');
+  const stepsWrapper = document.getElementById('stepsWrapper');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const stepCounter = document.getElementById('stepCounter');
+  const progressBar = document.getElementById('progressBar');
+  const totalSteps = document.querySelectorAll('.step').length;
+  let currentStep = 0;
 
-    let currentStep = 1;
-
-    function setStep(step) {
-      currentStep = step;
-
-      if (step === 1) {
-        step1El.classList.add("active");
-        step2El.classList.remove("active");
-        stepLabelEl.textContent = "Step 1 of 2";
-      } else {
-        step1El.classList.remove("active");
-        step2El.classList.add("active");
-        stepLabelEl.textContent = "Step 2 of 2";
-      }
-
-      dots.forEach((d) =>
-        d.classList.toggle("active", Number(d.dataset.stepDot) === step)
-      );
-
-      setTimeout(sendHeight, 60);
-    }
-
-    // highlight selected services
-    serviceListEl.addEventListener("change", (e) => {
-      const label = e.target.closest(".rc-service");
-      if (!label) return;
-      label.classList.toggle("selected", e.target.checked);
-    });
-
-    function getSelectedServices() {
-      const inputs = serviceListEl.querySelectorAll("input[type='checkbox']");
-      const selected = [];
-      inputs.forEach((i) => {
-        if (i.checked) selected.push(i.value);
-      });
-      return selected;
-    }
-
-    function validateStep1() {
-      const selected = getSelectedServices();
-      const valid = selected.length > 0;
-      servicesErrorEl.classList.toggle("visible", !valid);
-      return valid;
-    }
-
-    function validateStep2() {
-      let valid = true;
-
-      const name = nameInput.value.trim();
-      if (!name) {
-        nameError.classList.add("visible");
-        valid = false;
-      } else {
-        nameError.classList.remove("visible");
-      }
-
-      const email = emailInput.value.trim();
-      const emailOK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      if (!emailOK) {
-        emailError.classList.add("visible");
-        valid = false;
-      } else {
-        emailError.classList.remove("visible");
-      }
-
-      const phone = phoneInput.value.trim();
-      if (!phone) {
-        phoneError.classList.add("visible");
-        valid = false;
-      } else {
-        phoneError.classList.remove("visible");
-      }
-
-      return valid;
-    }
-
-    nextBtn.addEventListener("click", () => {
-      if (!validateStep1()) return;
-
-      // build summary tags
-      const selected = getSelectedServices();
-      summaryTags.innerHTML = "";
-      selected.forEach((svc) => {
-        const tag = document.createElement("span");
-        tag.className = "rc-tag";
-        tag.textContent = svc;
-        summaryTags.appendChild(tag);
-      });
-
-      setStep(2);
-    });
-
-    backBtn.addEventListener("click", () => {
-      setStep(1);
-    });
-
-    submitBtn.addEventListener("click", () => {
-      if (!validateStep2()) return;
-
-      const payload = {
-        type: "renoFormSubmit",
-        services: getSelectedServices(),
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        phone: phoneInput.value.trim(),
-        notes: notesInput.value.trim(),
-      };
-
-      // send payload up to Wix (or just log for now)
-      try {
-        window.parent.postMessage(JSON.stringify(payload), "*");
-      } catch (e) {
-        console.log("Form payload:", payload);
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitted";
-
-      alert(
-        "Thanks! Your details have been sent to Karks Contracting. We’ll follow up with a renovation estimate."
-      );
-
-      setTimeout(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Submit";
-      }, 2000);
-    });
-
-    // ----- HEIGHT MESSAGING FOR WIX -----
-    <script>
-  function sendHeight() {
-    var h = Math.max(
-      document.body.scrollHeight,
-      document.documentElement.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.offsetHeight
-    ) + 40; // small buffer
-
-    h = Math.ceil(h);
-
-    // send to the HTML wrapper inside Wix
-    window.parent.postMessage({ type: "calcHeight", height: h }, "*");
+  // Calculate total based on field values
+  function calculateTotal() {
+    // Parse each field as float (treat empty as 0)
+    const k = parseFloat(fields.kitchens.value) || 0;
+    const bth = parseFloat(fields.bathrooms.value) || 0;
+    const bsmt = parseFloat(fields.basement.value) || 0;
+    const fence = parseFloat(fields.fencing.value) || 0;
+    const deck = parseFloat(fields.decking.value) || 0;
+    const floor = parseFloat(fields.flooring.value) || 0;
+    const paint = parseFloat(fields.painting.value) || 0;
+    const dry = parseFloat(fields.drywall.value) || 0;
+    // Calculate total based on given rates
+    const total = (k * 20000) + (bth * 7000) + (bsmt * 75) + (fence * 30) +
+                  (deck * 50) + (floor * 6) + (paint * 2.5) + (dry * 2.5);
+    return Math.round(total); // round to nearest whole dollar
   }
 
-  window.addEventListener("load", sendHeight);
-  window.addEventListener("resize", sendHeight);
-  setInterval(sendHeight, 500);
+  // Update all visible total display elements
+  function updateTotalDisplay() {
+    const total = calculateTotal();
+    totalDisplays.forEach(span => {
+      span.textContent = total.toLocaleString(); // format with commas
+    });
+  }
+
+  // Update step UI (progress bar, step text, button visibility/text)
+  function updateStepUI() {
+    // Update progress bar width
+    const progressPercent = (currentStep / (totalSteps - 1)) * 100;
+    progressBar.style.width = progressPercent + '%';
+    // Update step counter text
+    stepCounter.textContent = 'Step ' + (currentStep + 1) + ' of ' + totalSteps;
+    // Show/hide Prev button
+    prevBtn.style.display = (currentStep === 0) ? 'none' : 'inline-block';
+    // Change Next button text on last step
+    nextBtn.textContent = (currentStep === totalSteps - 1) ? 'Submit' : 'Next';
+  }
+
+  // Navigate to a specific step index
+  function goToStep(index) {
+    if(index < 0 || index >= totalSteps) return;
+    currentStep = index;
+    // Move the steps wrapper using transform
+    stepsWrapper.style.transform = 'translateX(' + (-100 * currentStep) + '%)';
+    updateStepUI();
+    updateTotalDisplay();
+    sendHeight(); // adjust iframe height on parent
+  }
+
+  // Send postMessage to parent with current height for iframe resizing
+  function sendHeight() {
+    if(window.parent) {
+      const height = document.body.scrollHeight;
+      window.parent.postMessage({ height: height }, '*');
+    }
+  }
+
+  // Next/Prev button event handlers
+  nextBtn.addEventListener('click', function() {
+    if(currentStep === totalSteps - 1) {
+      // On final step, treat this as form submission
+      if(validateFinalStep()) {
+        // If validation passed, "submit" the form (for demo, just alert and reset maybe)
+        alert('Thank you! Your estimated total is $' + calculateTotal().toLocaleString() + 
+              '. We will contact you soon.');
+        // In a real scenario, here you might send data to server or email.
+        // For now, just reset the form (optional):
+        // document.querySelector('.calculator-container form')?.reset();
+      }
+    } else {
+      goToStep(currentStep + 1);
+    }
+  });
+  prevBtn.addEventListener('click', function() {
+    goToStep(currentStep - 1);
+  });
+
+  // Validation for final step contact fields
+  const nameField = document.getElementById('name');
+  const emailField = document.getElementById('email');
+  const phoneField = document.getElementById('phone');
+  const nameError = document.getElementById('nameError');
+  const emailError = document.getElementById('emailError');
+  const phoneError = document.getElementById('phoneError');
+
+  function validateFinalStep() {
+    let valid = true;
+    // Name must not be empty
+    if(!nameField.value.trim()) {
+      nameError.style.display = 'block';
+      nameField.classList.add('error-border');
+      valid = false;
+    } else {
+      nameError.style.display = 'none';
+      nameField.classList.remove('error-border');
+    }
+    // Email basic validation
+    const emailVal = emailField.value.trim();
+    if(!emailVal || !/.+@.+\..+/.test(emailVal)) {
+      emailError.style.display = 'block';
+      emailField.classList.add('error-border');
+      valid = false;
+    } else {
+      emailError.style.display = 'none';
+      emailField.classList.remove('error-border');
+    }
+    // Phone validation: require at least 7 digits (after stripping non-digits)
+    const phoneDigits = phoneField.value.replace(/\D/g,'');
+    if(phoneDigits.length < 7) {
+      phoneError.style.display = 'block';
+      phoneField.classList.add('error-border');
+      valid = false;
+    } else {
+      phoneError.style.display = 'none';
+      phoneField.classList.remove('error-border');
+    }
+    if(!valid) {
+      sendHeight(); // adjust height if errors shown
+    }
+    return valid;
+  }
+
+  // Attach input event listeners to all cost fields for live total update
+  for(let key in fields) {
+    fields[key].addEventListener('input', function() {
+      updateTotalDisplay();
+      // We also update height in case new lines (if large numbers wrap? unlikely)
+      sendHeight();
+    });
+  }
+
+  // Initialize UI on page load
+  goToStep(0);
+  updateTotalDisplay();
+
+  // Also adjust parent iframe height on load
+  window.addEventListener('load', sendHeight);
+})();
 </script>
 
 </body>
