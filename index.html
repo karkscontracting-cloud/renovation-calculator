@@ -1,397 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>Renovation Cost Calculator</title>
   <style>
-    /* Basic reset and typography */
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #ffffff;
-      color: #333;
-    }
-    .calculator-container {
-      max-width: 500px;
-      margin: 0 auto;
+      margin: 0;
       padding: 20px;
-    }
-    h2 {
-      text-align: center;
-      color: #002D62; /* navy */
-      margin-bottom: 10px;
-    }
-    p.step-counter {
-      text-align: center;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    /* Progress bar */
-    .progress-bar {
-      background: #f0f0f0;
-      border-radius: 5px;
-      overflow: hidden;
-      height: 8px;
-      margin-bottom: 20px;
-    }
-    .progress-bar .progress {
-      background: #FF8C00; /* orange */
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    /* Steps container */
-    .steps-wrapper {
-      display: flex;
-      transition: transform 0.4s ease;
-      /* width will auto-adjust to number of steps via flex; each step is 100% width */
+      box-sizing: border-box;
     }
     .step {
-      flex: 0 0 100%;
-      /* Each step panel occupies full container width */
-      box-sizing: border-box;
-      padding: 15px;
+      margin-bottom: 40px;
     }
-    .step input[type="number"],
-    .step input[type="text"],
-    .step input[type="email"],
-    .step input[type="tel"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-      box-sizing: border-box;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .step label {
-      font-weight: bold;
-    }
-    .step .note {
+    label, input {
       display: block;
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 10px;
+      margin: 5px 0;
     }
-    .total-display {
+    input {
+      padding: 5px;
+      width: 200px;
+    }
+    .total {
       font-weight: bold;
-      font-size: 1.1rem;
       margin-top: 10px;
-    }
-
-    /* Navigation buttons */
-    .navigation {
-      margin-top: 10px;
-      text-align: center;
-    }
-    .navigation button {
-      font: inherit;
-      padding: 12px 20px;
-      margin: 5px 10px;
-      border: 2px solid #002D62;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    #prevBtn {
-      background: #ffffff;
-      color: #002D62;
     }
     #nextBtn {
-      background: #FF8C00;
-      border-color: #FF8C00;
-      color: #fff;
-    }
-    .navigation button:hover {
-      opacity: 0.8;
-    }
-    .navigation button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Error message styling */
-    .error-msg {
-      color: #d00000;
-      font-size: 0.9rem;
-      display: none;
-      margin: -10px 0 10px 0;
-    }
-    .error-border {
-      border-color: #d00000 !important;
-    }
-
-    /* Hide number input spinners for a cleaner look (Chrome/Edge/Opera) */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    /* Hide spinner arrows for Firefox */
-    input[type=number] {
-      -moz-appearance: textfield;
+      padding: 10px 20px;
+      background-color: orange;
+      border: none;
+      color: white;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-
-<div class="calculator-container">
   <h2>Renovation Cost Calculator</h2>
-  <!-- Progress indicator -->
-  <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
-  <p class="step-counter" id="stepCounter">Step 1 of 9</p>
+  <div id="stepsContainer"></div>
+  <button id="nextBtn" onclick="nextStep()">Next</button>
 
-  <!-- Steps wrapper for sliding -->
-  <div class="steps-wrapper" id="stepsWrapper">
-    <!-- Step 1: Kitchen -->
-    <div class="step">
-      <label for="kitchens">Kitchen Renovation - How many kitchens?</label>
-      <span class="note">(Estimated $20,000 per kitchen)</span>
-      <input id="kitchens" name="kitchens" type="number" min="0" step="1" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 2: Bathroom -->
-    <div class="step">
-      <label for="bathrooms">Bathroom Renovation - How many bathrooms?</label>
-      <span class="note">(Estimated $7,000 per bathroom)</span>
-      <input id="bathrooms" name="bathrooms" type="number" min="0" step="1" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 3: Basement -->
-    <div class="step">
-      <label for="basement">Basement Renovation - Approx. area (sq ft)?</label>
-      <span class="note">(Estimated $75 per sq ft)</span>
-      <input id="basement" name="basement" type="number" min="0" step="any" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 4: Fencing -->
-    <div class="step">
-      <label for="fencing">Fencing - Approx. length (linear ft)?</label>
-      <span class="note">(Estimated $30 per linear ft)</span>
-      <input id="fencing" name="fencing" type="number" min="0" step="any" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 5: Decking -->
-    <div class="step">
-      <label for="decking">Decking - Approx. area (sq ft)?</label>
-      <span class="note">(Estimated $50 per sq ft)</span>
-      <input id="decking" name="decking" type="number" min="0" step="any" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 6: Flooring -->
-    <div class="step">
-      <label for="flooring">Flooring - Area to install (sq ft)?</label>
-      <span class="note">(Estimated $6 per sq ft)</span>
-      <input id="flooring" name="flooring" type="number" min="0" step="any" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 7: Painting -->
-    <div class="step">
-      <label for="painting">Painting - Area to paint (sq ft)?</label>
-      <span class="note">(Estimated $2.5 per sq ft)</span>
-      <input id="painting" name="painting" type="number" min="0" step="any" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 8: Drywall -->
-    <div class="step">
-      <label for="drywall">Drywall - Area to install (sq ft)?</label>
-      <span class="note">(Estimated $2.5 per sq ft)</span>
-      <input id="drywall" name="drywall" type="number" min="0" step="any" value="0" />
-      <div class="total-display">Current Total: $<span class="total-amount"></span></div>
-    </div>
-    <!-- Step 9: Contact Info (Final) -->
-    <div class="step">
-      <label for="name">Name:</label>
-      <input id="name" name="name" type="text" placeholder="Your Name" />
-      <span class="error-msg" id="nameError">Please enter your name.</span>
+  <script>
+    const steps = [
+      { id: 'kitchen', label: 'How many kitchens?', price: 20000 },
+      { id: 'bathroom', label: 'How many bathrooms?', price: 7000 },
+      { id: 'basement', label: 'Basement area (sq ft)?', price: 75 },
+      { id: 'fencing', label: 'Fencing length (ft)?', price: 30 },
+    ];
 
-      <label for="email">Email:</label>
-      <input id="email" name="email" type="email" placeholder="you@example.com" />
-      <span class="error-msg" id="emailError">Please enter a valid email.</span>
+    let currentStep = 0;
+    let totals = {};
 
-      <label for="phone">Phone:</label>
-      <input id="phone" name="phone" type="tel" placeholder="1234567890" />
-      <span class="error-msg" id="phoneError">Please enter a valid phone number.</span>
+    const container = document.getElementById("stepsContainer");
 
-      <div class="total-display">Estimated Total: $<span class="total-amount"></span></div>
-      <p style="margin-top: 5px; font-size: 0.9rem; color: #555;">
-        * This is a rough estimate. Actual costs may vary.
-      </p>
-    </div>
-  </div>
-
-  <!-- Navigation Buttons -->
-  <div class="navigation">
-    <button type="button" id="prevBtn">Previous</button>
-    <button type="button" id="nextBtn">Next</button>
-  </div>
-</div>
-
-<script>
-(function(){
-  // All input fields for cost calculation:
-  const fields = {
-    kitchens: document.getElementById('kitchens'),
-    bathrooms: document.getElementById('bathrooms'),
-    basement: document.getElementById('basement'),
-    fencing: document.getElementById('fencing'),
-    decking: document.getElementById('decking'),
-    flooring: document.getElementById('flooring'),
-    painting: document.getElementById('painting'),
-    drywall: document.getElementById('drywall')
-  };
-  const totalDisplays = document.querySelectorAll('.total-amount');
-  const stepsWrapper = document.getElementById('stepsWrapper');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const stepCounter = document.getElementById('stepCounter');
-  const progressBar = document.getElementById('progressBar');
-  const totalSteps = document.querySelectorAll('.step').length;
-  let currentStep = 0;
-
-  // Calculate total based on field values
-  function calculateTotal() {
-    // Parse each field as float (treat empty as 0)
-    const k = parseFloat(fields.kitchens.value) || 0;
-    const bth = parseFloat(fields.bathrooms.value) || 0;
-    const bsmt = parseFloat(fields.basement.value) || 0;
-    const fence = parseFloat(fields.fencing.value) || 0;
-    const deck = parseFloat(fields.decking.value) || 0;
-    const floor = parseFloat(fields.flooring.value) || 0;
-    const paint = parseFloat(fields.painting.value) || 0;
-    const dry = parseFloat(fields.drywall.value) || 0;
-    // Calculate total based on given rates
-    const total = (k * 20000) + (bth * 7000) + (bsmt * 75) + (fence * 30) +
-                  (deck * 50) + (floor * 6) + (paint * 2.5) + (dry * 2.5);
-    return Math.round(total); // round to nearest whole dollar
-  }
-
-  // Update all visible total display elements
-  function updateTotalDisplay() {
-    const total = calculateTotal();
-    totalDisplays.forEach(span => {
-      span.textContent = total.toLocaleString(); // format with commas
-    });
-  }
-
-  // Update step UI (progress bar, step text, button visibility/text)
-  function updateStepUI() {
-    // Update progress bar width
-    const progressPercent = (currentStep / (totalSteps - 1)) * 100;
-    progressBar.style.width = progressPercent + '%';
-    // Update step counter text
-    stepCounter.textContent = 'Step ' + (currentStep + 1) + ' of ' + totalSteps;
-    // Show/hide Prev button
-    prevBtn.style.display = (currentStep === 0) ? 'none' : 'inline-block';
-    // Change Next button text on last step
-    nextBtn.textContent = (currentStep === totalSteps - 1) ? 'Submit' : 'Next';
-  }
-
-  // Navigate to a specific step index
-  function goToStep(index) {
-    if(index < 0 || index >= totalSteps) return;
-    currentStep = index;
-    // Move the steps wrapper using transform
-    stepsWrapper.style.transform = 'translateX(' + (-100 * currentStep) + '%)';
-    updateStepUI();
-    updateTotalDisplay();
-    sendHeight(); // adjust iframe height on parent
-  }
-
-  // Send postMessage to parent with current height for iframe resizing
-  function sendHeight() {
-    if(window.parent) {
-      const height = document.body.scrollHeight;
-      window.parent.postMessage({ height: height }, '*');
-    }
-  }
-
-  // Next/Prev button event handlers
-  nextBtn.addEventListener('click', function() {
-    if(currentStep === totalSteps - 1) {
-      // On final step, treat this as form submission
-      if(validateFinalStep()) {
-        // If validation passed, "submit" the form (for demo, just alert and reset maybe)
-        alert('Thank you! Your estimated total is $' + calculateTotal().toLocaleString() + 
-              '. We will contact you soon.');
-        // In a real scenario, here you might send data to server or email.
-        // For now, just reset the form (optional):
-        // document.querySelector('.calculator-container form')?.reset();
-      }
-    } else {
-      goToStep(currentStep + 1);
-    }
-  });
-  prevBtn.addEventListener('click', function() {
-    goToStep(currentStep - 1);
-  });
-
-  // Validation for final step contact fields
-  const nameField = document.getElementById('name');
-  const emailField = document.getElementById('email');
-  const phoneField = document.getElementById('phone');
-  const nameError = document.getElementById('nameError');
-  const emailError = document.getElementById('emailError');
-  const phoneError = document.getElementById('phoneError');
-
-  function validateFinalStep() {
-    let valid = true;
-    // Name must not be empty
-    if(!nameField.value.trim()) {
-      nameError.style.display = 'block';
-      nameField.classList.add('error-border');
-      valid = false;
-    } else {
-      nameError.style.display = 'none';
-      nameField.classList.remove('error-border');
-    }
-    // Email basic validation
-    const emailVal = emailField.value.trim();
-    if(!emailVal || !/.+@.+\..+/.test(emailVal)) {
-      emailError.style.display = 'block';
-      emailField.classList.add('error-border');
-      valid = false;
-    } else {
-      emailError.style.display = 'none';
-      emailField.classList.remove('error-border');
-    }
-    // Phone validation: require at least 7 digits (after stripping non-digits)
-    const phoneDigits = phoneField.value.replace(/\D/g,'');
-    if(phoneDigits.length < 7) {
-      phoneError.style.display = 'block';
-      phoneField.classList.add('error-border');
-      valid = false;
-    } else {
-      phoneError.style.display = 'none';
-      phoneField.classList.remove('error-border');
-    }
-    if(!valid) {
-      sendHeight(); // adjust height if errors shown
-    }
-    return valid;
-  }
-
-  // Attach input event listeners to all cost fields for live total update
-  for(let key in fields) {
-    fields[key].addEventListener('input', function() {
-      updateTotalDisplay();
-      // We also update height in case new lines (if large numbers wrap? unlikely)
+    function renderStep() {
+      const step = steps[currentStep];
+      container.innerHTML = `
+        <div class="step">
+          <label>${step.label} (Estimated $${step.price} each)</label>
+          <input type="number" id="input-${step.id}" oninput="updateTotal('${step.id}', ${step.price})" />
+          <div class="total" id="total-${step.id}">Current Total: $0</div>
+        </div>
+      `;
       sendHeight();
-    });
-  }
+    }
 
-  // Initialize UI on page load
-  goToStep(0);
-  updateTotalDisplay();
+    function updateTotal(id, price) {
+      const val = parseFloat(document.getElementById(`input-${id}`).value) || 0;
+      const total = val * price;
+      document.getElementById(`total-${id}`).innerText = `Current Total: $${total.toLocaleString()}`;
+      totals[id] = total;
+      sendHeight();
+    }
 
-  // Also adjust parent iframe height on load
-  window.addEventListener('load', sendHeight);
-})();
-</script>
+    function nextStep() {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        renderStep();
+      } else {
+        container.innerHTML = "<h3>Calculation Complete</h3><pre>" + JSON.stringify(totals, null, 2) + "</pre>";
+        document.getElementById("nextBtn").style.display = "none";
+        sendHeight();
+      }
+    }
 
+    function sendHeight() {
+      setTimeout(() => {
+        const height = document.body.scrollHeight;
+        window.parent.postMessage(JSON.stringify({ type: "calcHeight", height }), "*");
+      }, 100);
+    }
+
+    renderStep();
+  </script>
 </body>
-</html>
+</html>  
